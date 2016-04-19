@@ -7,14 +7,13 @@
 %%% 
 
 %%% Preamble
-\documentclass[paper=a4, fontsize=11pt]{scrartcl}	% Article class of KOMA-script with 11pt font and a4 format
+\documentclass{article}
 \usepackage[T1]{fontenc}
-
 \usepackage[utf8]{inputenc}
-
 \usepackage{url}
 \usepackage[breaklinks,hidelinks]{hyperref}
 \usepackage{natbib}
+\usepackage{soul, color}
 
 \usepackage[english]{babel}															% English language/hyphenation
 \usepackage[protrusion=true,expansion=true]{microtype}				% Better typography
@@ -25,7 +24,7 @@
 
 %%% Custom sectioning (sectsty package)
 \usepackage{sectsty}												% Custom sectioning (see below)
-\allsectionsfont{\centering \normalfont\scshape}	% Change font of al section commands
+\allsectionsfont{\normalfont\scshape}	% Change font of al section commands
 
 
 %%% Custom headers/footers (fancyhdr package)
@@ -59,9 +58,10 @@
 		\horrule{1pt} \\[0.5cm]
 }
 \author{
-		\normalfont 								\normalsize
-        Michal Godek\\[-3pt]		\normalsize
-        \today
+		\normalfont 	\normalsize
+        Author: Michał Godek	\normalsize \\[0.2cm]
+        \footnotesize Supervisor: prof. dr hab. inż. Mieczysław Muraszkiewicz \normalfont 	 \normalsize \\[0.5cm]
+        \today \\[-3pt]
 }
 \date{}
 
@@ -72,26 +72,36 @@
 \tableofcontents
 \newpage
 
-\section{Topic overview (section)}
+\section{Task summary}
 The aim of the project is to create a recommendation system, which will aid finding music tracks of our liking.
 
-\subsection{Machine learning approach (subsection)}
+\subsection{Goals and objectives}
+
+\section{Task analysis}
+
+\subsection{Technical background}
+\subsubsection{Machine learning techniques}
 Use a few techniques collaborative filtering and content based filtering
 Create a ranking
 
-\subsubsection{Matrix factorization (subsubsection)}
+\paragraph{Matrix factorization}
 Matrix factorization for collaborative filtering
 
-\paragraph{TODO (paragraph)}
+\subsection{Development environment}
+\paragraph{Python + Spotify Web API} (perfect for collaborative filtering), can mix with private collection
+Tensorflow\cite{cosineSimilarity}
+MongoDB
+\paragraph{Data model}
+
+\section{Solution overview}
 TODO
 
-\subsection{Implementation environment (subsection)}
-Python + Spotify Web API (perfect for collaborative filtering), can mix with private collection
-Tensorflow\cite{cosineSimilarity}
+\subsection{}
 
-\section{Lists}
+\subsection{Implementation overview}
+TODO
 
-\subsection{Example for list (3*itemize)}
+\subsection{Program output}
 \begin{itemize}
 	\item First item in a list 
 		\begin{itemize}
@@ -105,12 +115,14 @@ Tensorflow\cite{cosineSimilarity}
 	\item Second item in a list 
 \end{itemize}
 
-\subsection{Example for list (enumerate)}
-\begin{enumerate}
-	\item First item in a list 
-	\item Second item in a list 
-	\item Third item in a list
-\end{enumerate}
+\section{Results}
+TODO
+%\begin{figure}[h!]
+%\centering
+%\includegraphics[scale=0.50]{TwitterLogo.png}
+%\end{figure}
+
+\section{Evaluation}
 
 \bibliographystyle{plain}
 \bibliography{references}
