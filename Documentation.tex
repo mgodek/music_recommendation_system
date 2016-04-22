@@ -8,6 +8,8 @@
 
 %%% Preamble
 \documentclass{article}
+\usepackage[a4paper,left=3cm,right=3cm,top=3cm,bottom=3cm]{geometry}
+\usepackage[nottoc,numbib]{tocbibind}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{url}
@@ -15,29 +17,12 @@
 \usepackage{natbib}
 \usepackage{soul, color}
 
-\usepackage[english]{babel}															% English language/hyphenation
-\usepackage[protrusion=true,expansion=true]{microtype}				% Better typography
-\usepackage{amsmath,amsfonts,amsthm}										% Math packages
-\usepackage[pdftex]{graphicx}														% Enable pdflatex
+\usepackage[english]{babel}						% English language/hyphenation
+\usepackage[protrusion=true,expansion=true]{microtype}			% Better typography
+\usepackage{amsmath,amsfonts,amsthm}										% Math 
+\usepackage[pdftex]{graphicx}														
 \usepackage{url}
-
-
-%%% Custom sectioning (sectsty package)
-\usepackage{sectsty}												% Custom sectioning (see below)
-\allsectionsfont{\normalfont\scshape}	% Change font of al section commands
-
-
-%%% Custom headers/footers (fancyhdr package)
-\usepackage{fancyhdr}
-\pagestyle{fancyplain}
-\fancyhead{}														% No page header
-\fancyfoot[L]{\small }
-\fancyfoot[C]{}													% Empty
-\fancyfoot[R]{\thepage}									% Pagenumbering
-\renewcommand{\headrulewidth}{0pt}			% Remove header underlines
-\renewcommand{\footrulewidth}{0pt}				% Remove footer underlines
-\setlength{\headheight}{13.6pt}
-
+\usepackage[parfill]{parskip}
 
 %%% Equation and float numbering
 \numberwithin{equation}{section}		% Equationnumbering: section.eq#
@@ -53,6 +38,7 @@
 		\usefont{OT1}{bch}{b}{n}
 		\normalfont \normalsize \textsc{Warsaw University of Technology} \\ [25pt]
 		\horrule{1pt} \\[0.4cm]
+		\normalfont \normalsize Project proposal\\
 		\huge Music recommendation system \\[0.3cm]
 		\normalfont \normalsize EINIS 2016L\\
 		\horrule{1pt} \\[0.5cm]
@@ -65,7 +51,6 @@
 }
 \date{}
 
-%%% Begin document
 \begin{document}
 \maketitle
 \newpage
@@ -73,39 +58,110 @@
 \newpage
 
 \section{Task summary}
-The aim of the project is to create a recommendation system, which will aid finding music tracks of our liking.
+The subject of the project is to create a recommendation system which will aid finding music tracks of ones liking. To achieve this, Collaborative Filtering together with Matrix Factorization technique will be used. Such an approach makes the solution domain agnostic and does not require to know feature details of ranked items. This makes it highly reusable for other content if only user preferences are available.
 
 \subsection{Goals and objectives}
+Objectives have been divided into two groups. The obligatory part, which is the key of the project, will be complete in whole. The optional piece will be left to decide if it should be executed at all, depending on the time required and result obtained from the first stage. 
+
+\subsection{Obligatory}
+Main goals of the project are to:
+\begin{itemize}
+	\item create a music recommender program, which outputs tracks based on an input playlist;
+	\item evaluate the resulting output.
+\end{itemize}
+
+\subsection{Optional}
+\begin{itemize}
+\item A few track features will be incorporated into the Collaborative Filtering model to aid the latent feature matrices creation.
+\item A possible extension is to use a much larger music data set and improve the computation time using either:
+\begin{itemize}
+	\item the Apache Spark library and deploying the solution to a cloud cluster;
+	\item the TensorFlow\cite{MatrixFactWithTensorFL} library and utilizing the GPU of a local machine or deploying the program to a cloud for computing.
+\end{itemize}
+\end{itemize}
 
 \section{Task analysis}
+This section lists the elements constituting the solution of the problem at hand.
 
-\subsection{Technical background}
-\subsubsection{Machine learning techniques}
-Use a few techniques collaborative filtering and content based filtering
-Create a ranking
+\subsection{Data set}
+The essence part of the project is the data set on which the prediction model will be created and evaluated. The archive called 'The Million Song Dataset'\cite{Bertin-Mahieux2011} provides a listing of a million tracks along with their features and a real user preference set. In this project the features of the tracks are ignored, instead the focus is put on the users' taste in music.
+The data set used in the obligatory part is limited only to a randomly chosen 1\% of the whole 280 GB repository.
 
-\paragraph{Matrix factorization}
-Matrix factorization for collaborative filtering
+\subsection{Prediction model}
+Collaborative Filtering is an approach to finding new content for recommendation to a user, which depends mostly on 'the wisdom of the crowd', where suggested music comes from other users' playlists. 
+This project will utilize the idea presented in the paper "Matrix Factorization
+Techniques for Recommender Systems"\cite{Koren:2009:MFT:1608565.1608614} written by the winners of 'Netflix Prize'. The concept behind it is that given a user - track preference matrix:
 
-\subsection{Development environment}
-\paragraph{Python + Spotify Web API} (perfect for collaborative filtering), can mix with private collection
-Tensorflow\cite{cosineSimilarity}
-MongoDB
-\paragraph{Data model}
+\begin{table}[h!]
+\centering
+  \begin{tabular}{c|cccc}
+             & \rotatebox[origin=c]{90}{Track 1} & \rotatebox[origin=c]{90}{Track 2} & \rotatebox[origin=c]{90}{Track 3} & \rotatebox[origin=c]{90}{Track 4} \\ \hline
+          User 1 & 7  & ?  & 1  & ?  \\
+          User 2 & ?  & ?  & ?  & 4  \\
+          User 3 & 9  & 0  & ?  & 2  \\
+          User 4 & 1  & 8  & ?  & 0
+  \end{tabular}
+\caption {User - Track preference matrix} \label{tab:title}
+\end{table}
+
+the algorithm searches for latent feature matrices:
+
+\begin{table}[h!]
+\centering
+  \begin{tabular}{c|cc}
+             & \rotatebox[origin=c]{90}{Feature 1} & \rotatebox[origin=c]{90}{Feature 2} \\ \hline
+          User 1 & ? & ?  \\
+          User 2 & ? & ?  \\
+          User 3 & ? & ?  \\
+          User 4 & ? & ?  
+  \end{tabular}
+\caption {Users - Latent features matrix} \label{tab:title}
+\end{table}
+
+\begin{table}[h!]
+\centering
+  \begin{tabular}{c|cccc}
+             & \rotatebox[origin=c]{90}{Track 1} & \rotatebox[origin=c]{90}{Track 2} & \rotatebox[origin=c]{90}{Track 3} & \rotatebox[origin=c]{90}{Track 4} \\ \hline
+          Feature 1 & ?  & ?  & ?  & ?  \\
+          Feature 2 & ?  & ?  & ?  & ?  
+  \end{tabular}
+\caption {Latent features - tracks matrix} \label{tab:title}
+\end{table}
+
+which when multiplied would create the input preference matrix. The latent matrices are calculate by iteratively improving them to find their optimal values and predict the missing values in the original user - item matrix.
+
+\subsection{Evaluation method}
+Assessment of the results of a recommender system is not straight forward, since for true grading of the solution, real users would need to evaluate it and share their opinion on the usefulness of the program. However, to achieve the goal of this project, two ways of testing are proposed:
+\begin{itemize}
+\item prediction will be checked against a test set, which will be manually prepared by removing ratings for some of the tracks known by a user. Than a check will be performed of the position of those manipulated tracks in the extended output ranking suggested to the user.
+\item the output playlist will be evaluated depending only on the subjective taste of the author.
+\end{itemize}
+
+\subsection{Assumptions and constraints}
+User input playlist is given with a play count for each of the tracks. Play count is treated as a measure of liking a user would has to each track.
+
+\iffalse
+\section{Development specifics}
+
+\subsection{Data model}
+
+\subsection{Python + Spotify Web API}
+(for creating the output playlist)
+sqlite https://docs.python.org/2/library/sqlite3.html
+
+\subsection{Tensorflow, Mahout, Fink}
 
 \section{Solution overview}
 TODO
+Pearson
+Mahout recommender
+\cite{cosineSimilarity}
 
-\subsection{}
-
-\subsection{Implementation overview}
-TODO
-
-\subsection{Program output}
+\subsection{Program steps}
 \begin{itemize}
-	\item First item in a list 
+	\item Provide a set of music tracks matching an input playlist
 		\begin{itemize}
-		\item First item in a list 
+		\item TODO
 			\begin{itemize}
 			\item First item in a list 
 			\item Second item in a list 
@@ -115,17 +171,19 @@ TODO
 	\item Second item in a list 
 \end{itemize}
 
-\section{Results}
+\section{Results evaluation}
 TODO
+
+Without the data set there would be a cold start problem.
+
+\fi
+
 %\begin{figure}[h!]
 %\centering
 %\includegraphics[scale=0.50]{TwitterLogo.png}
 %\end{figure}
 
-\section{Evaluation}
-
 \bibliographystyle{plain}
 \bibliography{references}
 
-%%% End document
 \end{document}
