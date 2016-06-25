@@ -1,6 +1,22 @@
 from __future__ import absolute_import, print_function
 import sys, os, signal, time
+
 from spotify import spotifyTest
+from parseUserPreference import UserTrackPreferences
+
+###############################################################################
+
+utp = UserTrackPreferences()
+
+###############################################################################
+
+def setup():
+    print("TODO")
+
+###############################################################################
+
+def matrixFactorize():
+    print( "TODO" )
 
 ###############################################################################
 
@@ -9,10 +25,16 @@ def readUserPlaylist():
     spotifyTest()
 
 ###############################################################################
- 
-def setup():
-    import sqlite3
-    conn = sqlite3.connect('example.db')
+
+def loadUserPref():
+    global utp
+    utp = UserTrackPreferences("../MillionSongSubset/train_triplets.txt")
+    utp.parseUserPref()
+
+###############################################################################
+
+def printStatus():
+    utp.print()
 
 ###############################################################################
 
@@ -27,8 +49,10 @@ def main_menu():
     #os.system('clear')
     
     print ("Please choose the function you want to start:")
-    print ("1. Run setup")
-    print ("2. Spotify test")
+    print ("1. Spotify test")
+    print ("2. Load Million Song Set user preferences")
+    print ("3. Matrix factorization")
+    print ("9. Print status")
     print ("0. Quit")
     choice = raw_input(" >>  ")
     exec_menu(choice)
@@ -52,22 +76,23 @@ def exec_menu(choice):
         except KeyError:
             print ("Wrong selection, please try again.")
             menu_actions['main_menu']()
-    return
+    main_menu()
 
 ###############################################################################
 
-# Menu definition
 menu_actions = {
     'main_menu': main_menu,
-    '1': setup,
-    '2': readUserPlaylist,
+    '1': readUserPlaylist,
+    '2': loadUserPref,
+    '3': matrixFactorize,
+    '9': printStatus,
     '0': exit,
 }
 
+###############################################################################
+
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
-    global interactive
-    interactive = False
     for x in sys.argv[1:]:
         if x == "init":
             setup()

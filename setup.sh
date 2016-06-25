@@ -8,4 +8,4 @@ else
 fi
 
 sudo pip install spotipy
-
+sudo pip install numpy
