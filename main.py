@@ -1,7 +1,7 @@
 from __future__ import absolute_import, print_function
 import sys, os, signal, time
 
-from spotify import spotifyTest
+from spotify import spotifyTest, fetchUserPlaylist
 from parseUserPreference import UserTrackPreferences
 from matrixFactor import matrixFactorize
 from parseMusicData import TrackListingParser
@@ -18,9 +18,18 @@ def setup():
 ###############################################################################
 
 def fetchSpotifyDataForEchonest():
-    #spotifyTest()
-    tlp = TrackListingParser("../MillionSongSubset/song_data.csv","song_data_spotify.csv")
-    tlp.parseTrackListing()
+    spotifyTest() # TODO uncomment
+#    tlp = TrackListingParser("../MillionSongSubset/song_data.csv","song_data_spotify.csv")
+#    tlp.parseTrackListing()
+
+###############################################################################
+
+def fetchUserSpotifyData():
+    username = "michal.godek@gmail.com"
+    choice = raw_input("Enter Spotify user name [%s] >>  " % username)
+    if choice != "":
+        username = choice
+    fetchUserPlaylist(username)
 
 ###############################################################################
 
@@ -49,19 +58,17 @@ def run():
 
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
-    #sys.exit(0)
     main_menu()
 
 ###############################################################################
 
 def main_menu():
-    #os.system('clear')
-    
     print ("Please choose the function you want to start:")
     print ("1. Run")
     print ("2. Fetch Spotify data for Echonest database")
     print ("3. Load Million Song Set user preferences")
-    print ("4. Matrix factorization")
+    print ("4. Fetch user playlist")
+    print ("5. Matrix factorization")
     print ("9. Print status")
     print ("0. Quit")
     choice = raw_input(" >>  ")
@@ -76,7 +83,6 @@ menu_actions  = {}
 ###############################################################################
 
 def exec_menu(choice):
-    #os.system('clear')
     ch = choice.lower()
     if ch == '':
         menu_actions['main_menu']()
@@ -95,7 +101,8 @@ menu_actions = {
     '1': run,
     '2': fetchSpotifyDataForEchonest,
     '3': loadUserPref,
-    '4': makePrediction,
+    '4': fetchUserSpotifyData,
+    '5': makePrediction,
     '9': printStatus,
     '0': exit,
 }
