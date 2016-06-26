@@ -1,8 +1,10 @@
 from __future__ import absolute_import, print_function
 import sys, os, signal, time
 
+import numpy
 from spotify import spotifyTest
 from parseUserPreference import UserTrackPreferences
+from matrixFactor import matrixFactorize
 
 ###############################################################################
 
@@ -15,11 +17,6 @@ def setup():
 
 ###############################################################################
 
-def matrixFactorize():
-    print( "TODO" )
-
-###############################################################################
-
 def readUserPlaylist():
     print( "TODO" )
     spotifyTest()
@@ -28,13 +25,24 @@ def readUserPlaylist():
 
 def loadUserPref():
     global utp
-    utp = UserTrackPreferences("../MillionSongSubset/train_triplets.txt")
+    utp = UserTrackPreferences("../MillionSongSubset/100.txt")
     utp.parseUserPref()
+
+###############################################################################
+
+def makePrediction():
+    matrixFactorize(utp)
 
 ###############################################################################
 
 def printStatus():
     utp.print()
+
+###############################################################################
+
+def run():
+    loadUserPref()
+    makePrediction()
 
 ###############################################################################
 
@@ -49,9 +57,10 @@ def main_menu():
     #os.system('clear')
     
     print ("Please choose the function you want to start:")
-    print ("1. Spotify test")
-    print ("2. Load Million Song Set user preferences")
-    print ("3. Matrix factorization")
+    print ("1. Run")
+    print ("2. Spotify test")
+    print ("3. Load Million Song Set user preferences")
+    print ("4. Matrix factorization")
     print ("9. Print status")
     print ("0. Quit")
     choice = raw_input(" >>  ")
@@ -82,9 +91,10 @@ def exec_menu(choice):
 
 menu_actions = {
     'main_menu': main_menu,
-    '1': readUserPlaylist,
-    '2': loadUserPref,
-    '3': matrixFactorize,
+    '1': run,
+    '2': readUserPlaylist,
+    '3': loadUserPref,
+    '4': makePrediction,
     '9': printStatus,
     '0': exit,
 }
