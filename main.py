@@ -1,10 +1,10 @@
 from __future__ import absolute_import, print_function
 import sys, os, signal, time
 
-import numpy
 from spotify import spotifyTest
 from parseUserPreference import UserTrackPreferences
 from matrixFactor import matrixFactorize
+from parseMusicData import TrackListingParser
 
 ###############################################################################
 
@@ -17,9 +17,10 @@ def setup():
 
 ###############################################################################
 
-def readUserPlaylist():
-    print( "TODO" )
-    spotifyTest()
+def fetchSpotifyDataForEchonest():
+    #spotifyTest()
+    tlp = TrackListingParser("../MillionSongSubset/song_data.csv","song_data_spotify.csv")
+    tlp.parseTrackListing()
 
 ###############################################################################
 
@@ -58,7 +59,7 @@ def main_menu():
     
     print ("Please choose the function you want to start:")
     print ("1. Run")
-    print ("2. Spotify test")
+    print ("2. Fetch Spotify data for Echonest database")
     print ("3. Load Million Song Set user preferences")
     print ("4. Matrix factorization")
     print ("9. Print status")
@@ -92,7 +93,7 @@ def exec_menu(choice):
 menu_actions = {
     'main_menu': main_menu,
     '1': run,
-    '2': readUserPlaylist,
+    '2': fetchSpotifyDataForEchonest,
     '3': loadUserPref,
     '4': makePrediction,
     '9': printStatus,
