@@ -63,3 +63,6 @@ target/
 
 #JET_IDE_FILES
 .idea/
+
+#SECURE CREDENTIALS
+spotify_app_credentials.txt
