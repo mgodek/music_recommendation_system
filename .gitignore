@@ -71,3 +71,4 @@ user_artist_preferences.txt
 song_data_*
 .cache*
 song_translation_*
+train_users_track*

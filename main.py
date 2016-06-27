@@ -9,7 +9,10 @@ from os import path
 
 ###############################################################################
 
-utp = UserTrackPreferences("../MillionSongSubset/10000.txt", "user_track_preferences.txt", "song_translation_echo_spotify.txt")
+utp = UserTrackPreferences("../MillionSongSubset/10000.txt",
+                           "train_users_track_preferences.txt",
+                           "user_track_preferences.txt",
+                           "song_translation_echo_spotify.txt")
 tlp = TrackListingParser("../MillionSongSubset/song_data.csv", "song_translation_RUNNING_CHANGE_echo_spotify.txt")
 
 ###############################################################################
@@ -35,6 +38,7 @@ def loadUserPref():
     global utp
     utp.parseTrainUserPref()
     utp.parseCurrentUserPref()
+    utp.filterTrainUserPrefFile()
 
 ###############################################################################
 

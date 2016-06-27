@@ -6,7 +6,12 @@ from parseMusicData import TrackListingParser
 ###############################################################################
 
 class UserTrackPreferences:
-    def __init__(self, train_triplet_file_path = "", user_triplet_file_path="", echo_spotify_translation_file_path=""):
+    def __init__(self,
+                 orig_train_triplet_file_path = "",
+                 train_triplet_file_path = "",
+                 user_triplet_file_path="",
+                 echo_spotify_translation_file_path=""):
+        self.orig_train_triplet_file_path = orig_train_triplet_file_path
         self.echo_spotify_translation_file_path = echo_spotify_translation_file_path
 
         self.username = ""
@@ -26,6 +31,8 @@ class UserTrackPreferences:
 
         self.user_triplet_file_path = user_triplet_file_path
 
+        self.user_feed_tracks = [] # use this set to filter recommended tracks, should not recommend known tracks
+        self.user_feed_artists = []
         self.user_recommendations = dict()
         self.echo_user_recommended_tracks = []
         self.spotify_recommended_tracks = []
@@ -47,19 +54,61 @@ class UserTrackPreferences:
             userId, songIdSpotify, playCount = line.strip().split('\t')
             if songIdSpotify in trackTranslation:
                 echoSongId = trackTranslation[songIdSpotify]
+                self.user_feed_tracks.append(echoSongId)
                 print("Checking %s" % echoSongId)
                 if echoSongId in self.echoSongIdToIdxMap:
                     print("Found %s" % echoSongId)
 
         fUserTrackPref.close()
 
+        # add artist for filtering
+        fArtists = open(path.relpath("user_artist_preferences.txt"), 'r')
+        for artist in fArtists:
+            self.user_feed_artists.append(artist.replace("\n", ""))
+        fArtists.close()
+        print(self.user_feed_tracks)
+
+    ###########################################################################
+
+    def filterTrainUserPrefFile(self):
+        file_path = path.relpath(self.orig_train_triplet_file_path)
+        forig = open(file_path, 'r')
+
+        user_feed_composite = self.user_feed_tracks + self.user_feed_artists
+        goodTrainUsers = []
+        for line in forig:
+            if any(x in line for x in user_feed_composite):
+                goodTrainUsers.append(line.split('\t', 1)[0])
+                #print(line)
+
+        forig.close()
+
+        goodTrainUsers = set(goodTrainUsers)
+        file_path = path.relpath(self.train_triplet_file_path)
+        ffiltered = open(file_path, 'w')
+
+        file_path = path.relpath(self.orig_train_triplet_file_path)
+        forig = open(file_path, 'r')
+        for line in forig:
+            if any(x in line for x in goodTrainUsers):
+                ffiltered.write(line)
+
+        forig.close()
+
+        ffiltered.close()
+
     ###########################################################################
 
     def parseTrainUserPref(self):
-        file_path = path.relpath(self.train_triplet_file_path)
-        f = open(file_path, 'r')
+        fUserTrackPref = ""
+        try:
+            file_path = path.relpath(self.train_triplet_file_path)
+            fUserTrackPref = open(file_path, 'r')
+        except:
+            print("File does not exist yet: %s Early return" % self.train_triplet_file_path)
+            return
 
-        for line in f:
+        for line in fUserTrackPref:
             userId, echoSongId, playCount = line.strip().split('\t')
 
             ######### GENERATE INT INDEXES FOR SONG AND USER STRING IDS ########
@@ -88,19 +137,18 @@ class UserTrackPreferences:
 
             self.user_track_like[userIdx][songIdx] = int(playCount)
 
-        f.close()
-
-    ###########################################################################
-
-    def filterUsersWithNoCoherenceToCurrentUser(self):
-        print("TODO")
+        fUserTrackPref.close()
 
     ###########################################################################
 
     def translateRecommendationToTracks(self, tlp):
         self.echo_user_recommended_tracks = []
         for songIdx, songValue in self.user_recommendations.items():
-            self.echo_user_recommended_tracks.append(self.songIdxToEchoSongIdMap[songIdx])
+            echoSongId = self.songIdxToEchoSongIdMap[songIdx]
+            if echoSongId not in self.user_feed_tracks:
+                self.echo_user_recommended_tracks.append(echoSongId)
+            else:
+                print("Skip %s which user knows" % echoSongId)
 
         #print(self.echo_user_recommended_tracks)
         self.spotify_recommended_tracks = tlp.getSpotifySongIds(self.echo_user_recommended_tracks)
