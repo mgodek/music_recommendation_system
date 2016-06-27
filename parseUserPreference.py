@@ -6,7 +6,9 @@ from parseMusicData import TrackListingParser
 ###############################################################################
 
 class UserTrackPreferences:
-    def __init__(self, train_triplet_file_path = "", user_triplet_file_path=""):
+    def __init__(self, train_triplet_file_path = "", user_triplet_file_path="", echo_spotify_translation_file_path=""):
+        self.echo_spotify_translation_file_path = echo_spotify_translation_file_path
+
         self.username = ""
         self.clientId = ""
         self.clientSecret = ""
@@ -31,7 +33,7 @@ class UserTrackPreferences:
     ###########################################################################
 
     def parseCurrentUserPref(self):
-        file_path = path.relpath("song_data_spotify_backup75k.csv")
+        file_path = path.relpath(self.echo_spotify_translation_file_path)
         fTrackTranslation = open(file_path, 'r')
         trackTranslation = dict()
         for line in fTrackTranslation:
@@ -90,6 +92,11 @@ class UserTrackPreferences:
 
     ###########################################################################
 
+    def filterUsersWithNoCoherenceToCurrentUser(self):
+        print("TODO")
+
+    ###########################################################################
+
     def translateRecommendationToTracks(self, tlp):
         self.echo_user_recommended_tracks = []
         for songIdx, songValue in self.user_recommendations.items():
@@ -97,7 +104,6 @@ class UserTrackPreferences:
 
         #print(self.echo_user_recommended_tracks)
         self.spotify_recommended_tracks = tlp.getSpotifySongIds(self.echo_user_recommended_tracks)
-
 
     ###########################################################################
 

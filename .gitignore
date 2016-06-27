@@ -68,3 +68,6 @@ target/
 spotify_app_credentials.txt
 user_track_preferences.txt
 user_artist_preferences.txt
+song_data_*
+.cache*
+song_translation_*

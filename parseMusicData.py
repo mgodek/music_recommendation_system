@@ -1,7 +1,6 @@
 from __future__ import absolute_import, print_function
 from os import path
 import string
-import time
 from spotify import fetchSpotifySongId
 
 ###############################################################################
@@ -20,7 +19,6 @@ class TrackListingParser:
         fin.readline() # skip first line
 
         for line in fin:
-            #time.sleep(2)
             song_id_echo, track_or, release, artist_or, year = line.strip().split(',')
             # remove punctuations
             exclude = set(string.punctuation)
@@ -54,7 +52,6 @@ class TrackListingParser:
         spotify_track_ids = []
 
         for line in fin:
-            #time.sleep(2)
             song_id_echo, track_or, release, artist_or, year = line.strip().split(',')
             if song_id_echo in echo_user_recommended_tracks:
                 print("Found match in database for echoSongId: %s" % song_id_echo)

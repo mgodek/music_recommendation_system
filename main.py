@@ -9,8 +9,8 @@ from os import path
 
 ###############################################################################
 
-utp = UserTrackPreferences("../MillionSongSubset/100.txt", "user_track_preferences.txt")
-tlp = TrackListingParser("../MillionSongSubset/song_data.csv", "song_data_spotify.csv")
+utp = UserTrackPreferences("../MillionSongSubset/10000.txt", "user_track_preferences.txt", "song_translation_echo_spotify.txt")
+tlp = TrackListingParser("../MillionSongSubset/song_data.csv", "song_translation_RUNNING_CHANGE_echo_spotify.txt")
 
 ###############################################################################
 
@@ -27,10 +27,6 @@ def setup():
     if utp.username == "":
         utp.username = devUserName
 
-###############################################################################
-
-def fetchUserSpotifyData():
-    global utp
     fetchUserPlaylists(utp)
 
 ###############################################################################
@@ -39,12 +35,6 @@ def loadUserPref():
     global utp
     utp.parseTrainUserPref()
     utp.parseCurrentUserPref()
-
-###############################################################################
-
-def createPlaylist():
-    global utp
-    createPlaylistForUser(utp)
 
 ###############################################################################
 
@@ -57,6 +47,12 @@ def makePrediction():
 
 ###############################################################################
 
+def run():
+    loadUserPref()
+    makePrediction()
+
+###############################################################################
+
 def printStatus():
     global utp
     utp.print()
@@ -66,13 +62,6 @@ def printStatus():
 def fetchSpotifyDataForEchonest():
     global tlp
     tlp.parseTrackListing()
-
-###############################################################################
-
-def run():
-    loadUserPref()
-    fetchUserSpotifyData()
-    makePrediction()
 
 ###############################################################################
 
@@ -90,11 +79,10 @@ def main_menu():
     print ("1. Setup")
     print ("2. Run all")
     print ("")
-    print ("3. Fetch Spotify data for Echonest database")
-    print ("4. Load MillionSongSet train users preferences")
-    print ("5. Fetch user spotify playlists")
-    print ("6. Make matrix factorization")
-    print ("7. Create recommended playlist")
+    print ("3. Load MillionSongSet train users preferences")
+    print ("4. Generate recommended playlist")
+    print ("")
+    print ("8. Fetch Spotify data for Echonest database")
     print ("9. Print status")
     print ("0. Quit")
     choice = raw_input(" >>  ")
@@ -126,11 +114,9 @@ menu_actions = {
     'main_menu': main_menu,
     '1': setup,
     '2': run,
-    '3': fetchSpotifyDataForEchonest,
-    '4': loadUserPref,
-    '5': fetchUserSpotifyData,
-    '6': makePrediction,
-    '7': createPlaylist,
+    '3': loadUserPref,
+    '4': makePrediction,
+    '8': fetchSpotifyDataForEchonest,
     '9': printStatus,
     '0': exit,
 }
