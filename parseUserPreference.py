@@ -1,6 +1,7 @@
 from __future__ import absolute_import, print_function
 from os import path
 from collections import defaultdict
+from parseMusicData import TrackListingParser
 
 ###############################################################################
 
@@ -16,12 +17,16 @@ class UserTrackPreferences:
         self.user_track_like = defaultdict(dict)
         self.userIdxMap = dict()
         self.nextUserIndex = 0
-        self.songIdxMap = dict()
+
+        self.songIdxToEchoSongIdMap = dict()
+        self.echoSongIdToIdxMap = dict()
         self.nextSongIndex = 0
 
         self.user_triplet_file_path = user_triplet_file_path
 
-        self.user_recommendations = []
+        self.user_recommendations = dict()
+        self.echo_user_recommended_tracks = []
+        self.spotify_recommended_tracks = []
 
     ###########################################################################
 
@@ -39,10 +44,10 @@ class UserTrackPreferences:
         for line in fUserTrackPref:
             userId, songIdSpotify, playCount = line.strip().split('\t')
             if songIdSpotify in trackTranslation:
-                songId = trackTranslation[songIdSpotify]
-                print("Checking %s" % songId)
-                if songId in self.songIdxMap:
-                    print("Found %s" % songId)
+                echoSongId = trackTranslation[songIdSpotify]
+                print("Checking %s" % echoSongId)
+                if echoSongId in self.echoSongIdToIdxMap:
+                    print("Found %s" % echoSongId)
 
         fUserTrackPref.close()
 
@@ -53,7 +58,7 @@ class UserTrackPreferences:
         f = open(file_path, 'r')
 
         for line in f:
-            userId, songId, playCount = line.strip().split('\t')
+            userId, echoSongId, playCount = line.strip().split('\t')
 
             ######### GENERATE INT INDEXES FOR SONG AND USER STRING IDS ########
             userIdx = 0
@@ -65,12 +70,13 @@ class UserTrackPreferences:
                 self.userIdxMap[userId] = userIdx
 
             songIdx = 0
-            if songId in self.songIdxMap:
-                songIdx = self.songIdxMap[songId]
+            if echoSongId in self.echoSongIdToIdxMap:
+                songIdx = self.echoSongIdToIdxMap[echoSongId]
             else:
                 songIdx = self.nextSongIndex
                 self.nextSongIndex += 1
-                self.songIdxMap[songId] = songIdx
+                self.echoSongIdToIdxMap[echoSongId] = songIdx
+                self.songIdxToEchoSongIdMap[songIdx] = echoSongId
             ######### GENERATE INT INDEXES FOR SONG AND USER STRING IDS ########
 
             if songIdx in self.global_track_like:
@@ -81,6 +87,17 @@ class UserTrackPreferences:
             self.user_track_like[userIdx][songIdx] = int(playCount)
 
         f.close()
+
+    ###########################################################################
+
+    def translateRecommendationToTracks(self, tlp):
+        self.echo_user_recommended_tracks = []
+        for songIdx, songValue in self.user_recommendations.items():
+            self.echo_user_recommended_tracks.append(self.songIdxToEchoSongIdMap[songIdx])
+
+        #print(self.echo_user_recommended_tracks)
+        self.spotify_recommended_tracks = tlp.getSpotifySongIds(self.echo_user_recommended_tracks)
+
 
     ###########################################################################
 

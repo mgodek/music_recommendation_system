@@ -1,7 +1,5 @@
 from __future__ import absolute_import, print_function
 import spotipy
-import sys
-import spotipy
 import spotipy.util as util
 from os import path
 
@@ -99,8 +97,8 @@ def createPlaylistForUser(utp):
 
         playlistsInitData = sp.user_playlist_create(userId, "EINIS_MUSIC_RECOMMENDATION")
         playlistId = playlistsInitData['id']
-        response = sp.user_playlist_add_tracks(user=userId, playlist_id=playlistId, tracks=["3xn1Ggm0X3EufcrKG5opJ3"]) #TODO
-        #print(response)
+        response = sp.user_playlist_add_tracks(user=userId, playlist_id=playlistId, tracks=utp.spotify_recommended_tracks)
+        print(response)
 
     else:
         print("Can't get token for %s", utp.username)

@@ -9,13 +9,13 @@ from os import path
 
 ###############################################################################
 
-utp = UserTrackPreferences()
+utp = UserTrackPreferences("../MillionSongSubset/100.txt", "user_track_preferences.txt")
+tlp = TrackListingParser("../MillionSongSubset/song_data.csv", "song_data_spotify.csv")
 
 ###############################################################################
 
 def setup():
     global utp
-    utp = UserTrackPreferences("../MillionSongSubset/100.txt","user_track_preferences.txt")
     fin = open(path.relpath("spotify_app_credentials.txt"), 'r')
     devUserName, clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
     fin.close()
@@ -51,6 +51,9 @@ def createPlaylist():
 def makePrediction():
     global utp
     matrixFactorize(utp)
+    global tlp
+    utp.translateRecommendationToTracks(tlp)
+    createPlaylistForUser(utp)
 
 ###############################################################################
 
@@ -61,13 +64,14 @@ def printStatus():
 ###############################################################################
 
 def fetchSpotifyDataForEchonest():
-    tlp = TrackListingParser("../MillionSongSubset/song_data.csv","song_data_spotify.csv")
+    global tlp
     tlp.parseTrackListing()
 
 ###############################################################################
 
 def run():
     loadUserPref()
+    fetchUserSpotifyData()
     makePrediction()
 
 ###############################################################################
@@ -80,10 +84,12 @@ def signal_handler(signal, frame):
 
 def main_menu():
     global utp
+    print ("")
     print (">>>> Running as user: %s <<<<" % utp.username)
     print ("Please choose the function you want to start:")
     print ("1. Setup")
     print ("2. Run all")
+    print ("")
     print ("3. Fetch Spotify data for Echonest database")
     print ("4. Load MillionSongSet train users preferences")
     print ("5. Fetch user spotify playlists")
