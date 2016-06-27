@@ -7,15 +7,6 @@ from os import path
 
 ###############################################################################
 
-def spotifyTest():
-    sp = spotipy.Spotify()
-
-    results = sp.search(q='weezer', limit=20)
-    for i, t in enumerate(results['tracks']['items']):
-        print('%d %s ' %(i, t['name']))
-
-###############################################################################
-
 def fetchSpotifySongId(artist, title):
     sp = spotipy.Spotify()
 
@@ -47,20 +38,17 @@ def saveUserPreferences(userTracks, userArtists, userId):
 
 ###############################################################################
 
-def fetchUserPlaylists(username):
-    fin = open(path.relpath("spotify_app_credentials.txt"), 'r')
-    devUserName, clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
-    fin.close()
+def fetchUserPlaylists(utp):
+    if utp.username == "":
+        print("Fail. Need to run Setup first. Early return.")
+        return
 
-    if username == "":
-        username = devUserName
-
-    print( "Login to Spotify as %s" % username )
+    print( "Login to Spotify as %s" % utp.username )
     scope = 'playlist-read-private user-top-read user-library-read playlist-modify-private playlist-modify-public'
-    token = util.prompt_for_user_token(client_id=clientId,
-                                       client_secret=clientSecret,
-                                       redirect_uri=redirectUri,
-                                       username=username, scope=scope)
+    token = util.prompt_for_user_token(client_id=utp.clientId,
+                                       client_secret=utp.clientSecret,
+                                       redirect_uri=utp.redirect_uri,
+                                       username=utp.username, scope=scope)
 
     if token:
         sp = spotipy.Spotify(auth=token)
@@ -89,31 +77,25 @@ def fetchUserPlaylists(username):
         saveUserPreferences(userTracks, userArtists, userId)
 
     else:
-        print("Can't get token for %s", username)
+        print("Can't get token for %s", utp.username)
 
 ###############################################################################
 
-def createPlaylistForUser(username):
-    fin = open(path.relpath("spotify_app_credentials.txt"), 'r')
-    devUserName, clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
-    fin.close()
+def createPlaylistForUser(utp):
+    if utp.username == "":
+        print("Fail. Need to run Setup first. Early return.")
+        return
 
-    if username == "":
-        username = devUserName
-
-    print( "Login to Spotify as %s" % username )
+    print( "Login to Spotify as %s" % utp.username )
     scope = 'playlist-read-private user-top-read user-library-read playlist-modify-private playlist-modify-public'
-    token = util.prompt_for_user_token(client_id=clientId,
-                                       client_secret=clientSecret,
-                                       redirect_uri=redirectUri,
-                                       username=username, scope=scope)
+    token = util.prompt_for_user_token(client_id=utp.clientId,
+                                       client_secret=utp.clientSecret,
+                                       redirect_uri=utp.redirect_uri,
+                                       username=utp.username, scope=scope)
 
     if token:
         sp = spotipy.Spotify(auth=token)
         userId = sp.current_user()["id"]
-
-        userArtists = []
-        userTracks = []
 
         playlistsInitData = sp.user_playlist_create(userId, "EINIS_MUSIC_RECOMMENDATION")
         playlistId = playlistsInitData['id']
@@ -121,6 +103,6 @@ def createPlaylistForUser(username):
         #print(response)
 
     else:
-        print("Can't get token for %s", username)
+        print("Can't get token for %s", utp.username)
 
 ###############################################################################

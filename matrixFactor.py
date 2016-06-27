@@ -41,8 +41,6 @@ def matrixFactorize(userTrackPreference):
     print( "matrixFactorize" )
     R = createPreferenceMatrix(userTrackPreference)
 
-    #R = numpy.array(R)
-
     N = len(R)
     M = len(R[0])
     K = 2
@@ -54,6 +52,14 @@ def matrixFactorize(userTrackPreference):
 #    print(nP)
 #    print(nQ)
     nR = numpy.dot(nP, nQ.T)
-    print(nR)
+    print(nR[0])
+    songIdx = 0
+    for element in nR[0]:
+        print(element)
+        print(songIdx)
+        userTrackPreference.user_recommendations.append(songIdx)
+        songIdx += 1
+
+    print(userTrackPreference.user_recommendations)
 
 ###############################################################################

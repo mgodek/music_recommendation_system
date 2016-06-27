@@ -6,6 +6,11 @@ from collections import defaultdict
 
 class UserTrackPreferences:
     def __init__(self, train_triplet_file_path = "", user_triplet_file_path=""):
+        self.username = ""
+        self.clientId = ""
+        self.clientSecret = ""
+        self.redirect_uri = ""
+
         self.train_triplet_file_path  = train_triplet_file_path
         self.global_track_like = dict()
         self.user_track_like = defaultdict(dict)
@@ -15,6 +20,8 @@ class UserTrackPreferences:
         self.nextSongIndex = 0
 
         self.user_triplet_file_path = user_triplet_file_path
+
+        self.user_recommendations = []
 
     ###########################################################################
 
@@ -78,6 +85,7 @@ class UserTrackPreferences:
     ###########################################################################
 
     def print(self):
+        print("Username %s" % self.username)
         print("Global track likes:")
         for songId in self.global_track_like:
             print(songId, ':', self.global_track_like[songId])

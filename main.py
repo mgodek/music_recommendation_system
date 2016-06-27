@@ -1,10 +1,11 @@
 from __future__ import absolute_import, print_function
 import sys, os, signal, time
 
-from spotify import spotifyTest, fetchUserPlaylists, createPlaylistForUser
+from spotify import fetchUserPlaylists, createPlaylistForUser
 from parseUserPreference import UserTrackPreferences
 from matrixFactor import matrixFactorize
 from parseMusicData import TrackListingParser
+from os import path
 
 ###############################################################################
 
@@ -13,44 +14,55 @@ utp = UserTrackPreferences()
 ###############################################################################
 
 def setup():
-    print("TODO")
+    global utp
+    utp = UserTrackPreferences("../MillionSongSubset/100.txt","user_track_preferences.txt")
+    fin = open(path.relpath("spotify_app_credentials.txt"), 'r')
+    devUserName, clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
+    fin.close()
+    utp.clientId = clientId
+    utp.clientSecret = clientSecret
+    utp.redirect_uri = redirectUri
 
-###############################################################################
-
-def createPlaylist():
-    username = "" #TODO
-    createPlaylistForUser(username)
-
-###############################################################################
-
-def fetchSpotifyDataForEchonest():
-    spotifyTest() # TODO uncomment
-#    tlp = TrackListingParser("../MillionSongSubset/song_data.csv","song_data_spotify.csv")
-#    tlp.parseTrackListing()
+    utp.username = raw_input("Enter Spotify user name [e-mail] >>  ")
+    if utp.username == "":
+        utp.username = devUserName
 
 ###############################################################################
 
 def fetchUserSpotifyData():
-    username = raw_input("Enter Spotify user name [e-mail] >>  ")
-    fetchUserPlaylists(username)
+    global utp
+    fetchUserPlaylists(utp)
 
 ###############################################################################
 
 def loadUserPref():
     global utp
-    utp = UserTrackPreferences("../MillionSongSubset/100.txt","user_track_preferences.txt")
     utp.parseTrainUserPref()
     utp.parseCurrentUserPref()
 
 ###############################################################################
 
+def createPlaylist():
+    global utp
+    createPlaylistForUser(utp)
+
+###############################################################################
+
 def makePrediction():
+    global utp
     matrixFactorize(utp)
 
 ###############################################################################
 
 def printStatus():
+    global utp
     utp.print()
+
+###############################################################################
+
+def fetchSpotifyDataForEchonest():
+    tlp = TrackListingParser("../MillionSongSubset/song_data.csv","song_data_spotify.csv")
+    tlp.parseTrackListing()
 
 ###############################################################################
 
@@ -67,13 +79,16 @@ def signal_handler(signal, frame):
 ###############################################################################
 
 def main_menu():
+    global utp
+    print (">>>> Running as user: %s <<<<" % utp.username)
     print ("Please choose the function you want to start:")
-    print ("1. Run")
-    print ("2. Fetch Spotify data for Echonest database")
-    print ("3. Load Million Song Set user preferences")
-    print ("4. Fetch user playlist")
-    print ("5. Matrix factorization")
-    print ("6. Create recommended playlist")
+    print ("1. Setup")
+    print ("2. Run all")
+    print ("3. Fetch Spotify data for Echonest database")
+    print ("4. Load MillionSongSet train users preferences")
+    print ("5. Fetch user spotify playlists")
+    print ("6. Make matrix factorization")
+    print ("7. Create recommended playlist")
     print ("9. Print status")
     print ("0. Quit")
     choice = raw_input(" >>  ")
@@ -103,12 +118,13 @@ def exec_menu(choice):
 
 menu_actions = {
     'main_menu': main_menu,
-    '1': run,
-    '2': fetchSpotifyDataForEchonest,
-    '3': loadUserPref,
-    '4': fetchUserSpotifyData,
-    '5': makePrediction,
-    '6': createPlaylist,
+    '1': setup,
+    '2': run,
+    '3': fetchSpotifyDataForEchonest,
+    '4': loadUserPref,
+    '5': fetchUserSpotifyData,
+    '6': makePrediction,
+    '7': createPlaylist,
     '9': printStatus,
     '0': exit,
 }
