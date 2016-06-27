@@ -19,17 +19,25 @@ class UserTrackPreferences:
     ###########################################################################
 
     def parseCurrentUserPref(self):
+        file_path = path.relpath("song_data_spotify_backup75k.csv")
+        fTrackTranslation = open(file_path, 'r')
+        trackTranslation = dict()
+        for line in fTrackTranslation:
+            song_id_echo, song_id_spotify = line.strip().split(':')
+            trackTranslation[song_id_spotify] = song_id_echo
+        fTrackTranslation.close()
+
         file_path = path.relpath(self.user_triplet_file_path)
-        f = open(file_path, 'r')
+        fUserTrackPref = open(file_path, 'r')
+        for line in fUserTrackPref:
+            userId, songIdSpotify, playCount = line.strip().split('\t')
+            if songIdSpotify in trackTranslation:
+                songId = trackTranslation[songIdSpotify]
+                print("Checking %s" % songId)
+                if songId in self.songIdxMap:
+                    print("Found %s" % songId)
 
-        for line in f:
-            userId, songId, playCount = line.strip().split('\t')
-
-            # TODO translate to echo ID
-            if songId in self.songIdxMap:
-                print("Found %d" % songId)
-
-        f.close()
+        fUserTrackPref.close()
 
     ###########################################################################
 
@@ -55,7 +63,7 @@ class UserTrackPreferences:
             else:
                 songIdx = self.nextSongIndex
                 self.nextSongIndex += 1
-                self.songIdxMap[songIdx] = songId
+                self.songIdxMap[songId] = songIdx
             ######### GENERATE INT INDEXES FOR SONG AND USER STRING IDS ########
 
             if songIdx in self.global_track_like:
