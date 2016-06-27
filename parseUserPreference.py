@@ -5,8 +5,8 @@ from collections import defaultdict
 ###############################################################################
 
 class UserTrackPreferences:
-    def __init__(self, file_path = ""):
-        self.file_path  = file_path
+    def __init__(self, train_triplet_file_path = "", user_triplet_file_path=""):
+        self.train_triplet_file_path  = train_triplet_file_path
         self.global_track_like = dict()
         self.user_track_like = defaultdict(dict)
         self.userIdxMap = dict()
@@ -14,10 +14,27 @@ class UserTrackPreferences:
         self.songIdxMap = dict()
         self.nextSongIndex = 0
 
+        self.user_triplet_file_path = user_triplet_file_path
+
     ###########################################################################
 
-    def parseUserPref(self):
-        file_path = path.relpath(self.file_path)
+    def parseCurrentUserPref(self):
+        file_path = path.relpath(self.user_triplet_file_path)
+        f = open(file_path, 'r')
+
+        for line in f:
+            userId, songId, playCount = line.strip().split('\t')
+
+            # TODO translate to echo ID
+            if songId in self.songIdxMap:
+                print("Found %d" % songId)
+
+        f.close()
+
+    ###########################################################################
+
+    def parseTrainUserPref(self):
+        file_path = path.relpath(self.train_triplet_file_path)
         f = open(file_path, 'r')
 
         for line in f:

@@ -14,10 +14,6 @@ def spotifyTest():
     for i, t in enumerate(results['tracks']['items']):
         print('%d %s ' %(i, t['name']))
 
-    results = sp.search(q='SOMPVQB12A8C1379BB', limit=20)
-    for i, t in enumerate(results['tracks']['items']):
-        print('%d %s ' % (i, t['name']))
-
 ###############################################################################
 
 def fetchSpotifySongId(artist, title):
@@ -35,10 +31,29 @@ def show_tracks(tracks):
 
 ###############################################################################
 
+def saveUserPreferences(userTracks, userArtists, userId):
+    # save track ids to file
+    userRating = "20"
+    foutPref = open(path.relpath("user_track_preferences.txt"), 'w')
+    for item in userTracks:
+        foutPref.write(userId + '\t' + item + '\t' + userRating + '\n')
+    foutPref.close()
+
+    foutArtists = open(path.relpath("user_artist_preferences.txt"), 'w')
+    userArtists = set(userArtists)
+    for item in userArtists:
+        foutArtists.write(item + '\n')
+    foutArtists.close()
+
+###############################################################################
+
 def fetchUserPlaylist(username):
     fin = open(path.relpath("spotify_app_credentials.txt"), 'r')
-    clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
+    devUserName, clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
     fin.close()
+
+    if username == "":
+        username = devUserName
 
     print( "Login to Spotify as %s" % username )
     scope = 'playlist-read-private user-top-read user-library-read'
@@ -51,18 +66,27 @@ def fetchUserPlaylist(username):
         sp = spotipy.Spotify(auth=token)
         userId = sp.current_user()["id"]
 
+        userArtists = []
+        userTracks = []
+
         playlists = sp.user_playlists(userId)
         for playlist in playlists['items']:
             if playlist['owner']['id'] == userId:
                 print( playlist['name'])
                 print( '  total tracks', playlist['tracks']['total'])
-                results = sp.user_playlist(userId, playlist['id'],
-                    fields="tracks,next")
+                results = sp.user_playlist(userId, playlist['id'], fields="tracks,next")
                 tracks = results['tracks']
                 show_tracks(tracks)
                 while tracks['next']:
                     tracks = sp.next(tracks)
-                    show_tracks(tracks) #TODO save songIds
+                    show_tracks(tracks)
+                    # store songIds
+                    for i, item in enumerate(tracks['items']):
+                        userTracks.append(item['track']['id'])
+                        #print(item['track']['artists'][0]['name'])
+                        userArtists.append(item['track']['artists'][0]['name'].encode('utf-8'))
+
+        saveUserPreferences(userTracks, userArtists, userId)
 
     else:
         print("Can't get token for %s", username)

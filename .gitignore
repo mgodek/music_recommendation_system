@@ -66,3 +66,5 @@ target/
 
 #SECURE CREDENTIALS
 spotify_app_credentials.txt
+user_track_preferences.txt
+user_artist_preferences.txt

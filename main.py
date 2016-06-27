@@ -25,18 +25,16 @@ def fetchSpotifyDataForEchonest():
 ###############################################################################
 
 def fetchUserSpotifyData():
-    username = "michal.godek@gmail.com"
-    choice = raw_input("Enter Spotify user name [%s] >>  " % username)
-    if choice != "":
-        username = choice
-    fetchUserPlaylist(username)
+    choice = raw_input("Enter Spotify user name [e-mail] >>  ")
+    fetchUserPlaylist(choice)
 
 ###############################################################################
 
 def loadUserPref():
     global utp
-    utp = UserTrackPreferences("../MillionSongSubset/100.txt")
-    utp.parseUserPref()
+    utp = UserTrackPreferences("../MillionSongSubset/100.txt","user_track_preferences.txt")
+    utp.parseTrainUserPref()
+    utp.parseCurrentUserPref()
 
 ###############################################################################
 
