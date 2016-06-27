@@ -47,7 +47,7 @@ def saveUserPreferences(userTracks, userArtists, userId):
 
 ###############################################################################
 
-def fetchUserPlaylist(username):
+def fetchUserPlaylists(username):
     fin = open(path.relpath("spotify_app_credentials.txt"), 'r')
     devUserName, clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
     fin.close()
@@ -56,7 +56,7 @@ def fetchUserPlaylist(username):
         username = devUserName
 
     print( "Login to Spotify as %s" % username )
-    scope = 'playlist-read-private user-top-read user-library-read'
+    scope = 'playlist-read-private user-top-read user-library-read playlist-modify-private playlist-modify-public'
     token = util.prompt_for_user_token(client_id=clientId,
                                        client_secret=clientSecret,
                                        redirect_uri=redirectUri,
@@ -87,6 +87,38 @@ def fetchUserPlaylist(username):
                         userArtists.append(item['track']['artists'][0]['name'].encode('utf-8'))
 
         saveUserPreferences(userTracks, userArtists, userId)
+
+    else:
+        print("Can't get token for %s", username)
+
+###############################################################################
+
+def createPlaylistForUser(username):
+    fin = open(path.relpath("spotify_app_credentials.txt"), 'r')
+    devUserName, clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
+    fin.close()
+
+    if username == "":
+        username = devUserName
+
+    print( "Login to Spotify as %s" % username )
+    scope = 'playlist-read-private user-top-read user-library-read playlist-modify-private playlist-modify-public'
+    token = util.prompt_for_user_token(client_id=clientId,
+                                       client_secret=clientSecret,
+                                       redirect_uri=redirectUri,
+                                       username=username, scope=scope)
+
+    if token:
+        sp = spotipy.Spotify(auth=token)
+        userId = sp.current_user()["id"]
+
+        userArtists = []
+        userTracks = []
+
+        playlistsInitData = sp.user_playlist_create(userId, "EINIS_MUSIC_RECOMMENDATION")
+        playlistId = playlistsInitData['id']
+        response = sp.user_playlist_add_tracks(user=userId, playlist_id=playlistId, tracks=["3xn1Ggm0X3EufcrKG5opJ3"]) #TODO
+        #print(response)
 
     else:
         print("Can't get token for %s", username)

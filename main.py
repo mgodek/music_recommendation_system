@@ -1,7 +1,7 @@
 from __future__ import absolute_import, print_function
 import sys, os, signal, time
 
-from spotify import spotifyTest, fetchUserPlaylist
+from spotify import spotifyTest, fetchUserPlaylists, createPlaylistForUser
 from parseUserPreference import UserTrackPreferences
 from matrixFactor import matrixFactorize
 from parseMusicData import TrackListingParser
@@ -17,6 +17,12 @@ def setup():
 
 ###############################################################################
 
+def createPlaylist():
+    username = "" #TODO
+    createPlaylistForUser(username)
+
+###############################################################################
+
 def fetchSpotifyDataForEchonest():
     spotifyTest() # TODO uncomment
 #    tlp = TrackListingParser("../MillionSongSubset/song_data.csv","song_data_spotify.csv")
@@ -25,8 +31,8 @@ def fetchSpotifyDataForEchonest():
 ###############################################################################
 
 def fetchUserSpotifyData():
-    choice = raw_input("Enter Spotify user name [e-mail] >>  ")
-    fetchUserPlaylist(choice)
+    username = raw_input("Enter Spotify user name [e-mail] >>  ")
+    fetchUserPlaylists(username)
 
 ###############################################################################
 
@@ -67,6 +73,7 @@ def main_menu():
     print ("3. Load Million Song Set user preferences")
     print ("4. Fetch user playlist")
     print ("5. Matrix factorization")
+    print ("6. Create recommended playlist")
     print ("9. Print status")
     print ("0. Quit")
     choice = raw_input(" >>  ")
@@ -101,6 +108,7 @@ menu_actions = {
     '3': loadUserPref,
     '4': fetchUserSpotifyData,
     '5': makePrediction,
+    '6': createPlaylist,
     '9': printStatus,
     '0': exit,
 }
