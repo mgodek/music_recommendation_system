@@ -62,10 +62,12 @@ def fetchUserPlaylists(utp):
                 print( '  total tracks', playlist['tracks']['total'])
                 results = sp.user_playlist(userId, playlist['id'], fields="tracks,next")
                 tracks = results['tracks']
-                show_tracks(tracks)
+                for i, item in enumerate(tracks['items']):
+                    userTracks.append(item['track']['id'])
+                #show_tracks(tracks)
                 while tracks['next']:
                     tracks = sp.next(tracks)
-                    show_tracks(tracks)
+                    #show_tracks(tracks)
                     # store songIds
                     for i, item in enumerate(tracks['items']):
                         userTracks.append(item['track']['id'])
@@ -80,6 +82,10 @@ def fetchUserPlaylists(utp):
 ###############################################################################
 
 def createPlaylistForUser(utp):
+    if len(utp.spotify_recommended_tracks) == 0:
+        print("Missing recommended tracks. Early return")
+        return
+
     if utp.username == "":
         print("Fail. Need to run Setup first. Early return.")
         return
@@ -95,10 +101,11 @@ def createPlaylistForUser(utp):
         sp = spotipy.Spotify(auth=token)
         userId = sp.current_user()["id"]
 
-        playlistsInitData = sp.user_playlist_create(userId, "EINIS_MUSIC_RECOMMENDATION")
+        playlistsInitData = sp.user_playlist_create(userId, utp.createdPlaylistName)
         playlistId = playlistsInitData['id']
-        response = sp.user_playlist_add_tracks(user=userId, playlist_id=playlistId, tracks=utp.spotify_recommended_tracks)
-        print(response)
+        #print(utp.spotify_recommended_tracks)
+        response = sp.user_playlist_add_tracks(user=userId, playlist_id=playlistId, tracks=utp.spotify_recommended_tracks[:50]) # TODO this reduction influences a lot
+        #print(response)
 
     else:
         print("Can't get token for %s", utp.username)

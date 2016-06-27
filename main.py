@@ -6,18 +6,19 @@ from parseUserPreference import UserTrackPreferences
 from matrixFactor import matrixFactorize
 from parseMusicData import TrackListingParser
 from os import path
+from parseUserPreference import createPlaylistFromFile
 
 ###############################################################################
 
 utp = UserTrackPreferences("../MillionSongSubset/10000.txt",
                            "train_users_track_preferences.txt",
                            "user_track_preferences.txt",
-                           "song_translation_echo_spotify.txt")
+                           "user_favorites_translation.txt")#"song_translation_echo_spotify.txt")
 tlp = TrackListingParser("../MillionSongSubset/song_data.csv", "song_translation_RUNNING_CHANGE_echo_spotify.txt")
 
 ###############################################################################
 
-def setup():
+def setupUser(fetch=True):
     global utp
     fin = open(path.relpath("spotify_app_credentials.txt"), 'r')
     devUserName, clientId, clientSecret, redirectUri = fin.readline().strip().split(' ')
@@ -26,19 +27,28 @@ def setup():
     utp.clientSecret = clientSecret
     utp.redirect_uri = redirectUri
 
-    utp.username = raw_input("Enter Spotify user name [e-mail] >>  ")
+    utp.username = raw_input("Enter Spotify user name [e-mail, leave empty for default] >>  ")
     if utp.username == "":
         utp.username = devUserName
 
-    fetchUserPlaylists(utp)
+    if fetch == True:
+        fetchUserPlaylists(utp)
 
 ###############################################################################
 
 def loadUserPref():
     global utp
-    utp.parseTrainUserPref()
+    print("Filter train data")
+    t0 = time.clock()
+#    utp.parseTrainUserPref()
     utp.parseCurrentUserPref()
     utp.filterTrainUserPrefFile()
+    #utp.print()
+    utp.clear()
+    utp.parseTrainUserPref()
+    utp.parseCurrentUserPref() # need to parse current user data again after filtering
+    print("Time spent %s" % str(time.clock() - t0))
+    utp.print()
 
 ###############################################################################
 
@@ -52,8 +62,17 @@ def makePrediction():
 ###############################################################################
 
 def run():
+    setupUser()
     loadUserPref()
     makePrediction()
+
+###############################################################################
+
+def createPlaylistFromFileMenu():
+    global utp
+    global tlp
+    setupUser(False)
+    createPlaylistFromFile(tlp, utp, "user_favorites.txt")
 
 ###############################################################################
 
@@ -80,14 +99,15 @@ def main_menu():
     print ("")
     print (">>>> Running as user: %s <<<<" % utp.username)
     print ("Please choose the function you want to start:")
-    print ("1. Setup")
-    print ("2. Run all")
+    print ("1. Run all [2 3 4]")
     print ("")
+    print ("2. Setup user")
     print ("3. Load MillionSongSet train users preferences")
     print ("4. Generate recommended playlist")
     print ("")
-    print ("8. Fetch Spotify data for Echonest database")
-    print ("9. Print status")
+    print ("7. Create Spotify playlist from file")
+    print ("8. Fetch Spotify data for Echonest database [expert option]")
+    print ("9. Print status[debug option]")
     print ("0. Quit")
     choice = raw_input(" >>  ")
     exec_menu(choice)
@@ -116,10 +136,11 @@ def exec_menu(choice):
 
 menu_actions = {
     'main_menu': main_menu,
-    '1': setup,
-    '2': run,
+    '1': run,
+    '2': setupUser,
     '3': loadUserPref,
     '4': makePrediction,
+    '7': createPlaylistFromFileMenu,
     '8': fetchSpotifyDataForEchonest,
     '9': printStatus,
     '0': exit,
@@ -129,11 +150,10 @@ menu_actions = {
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
-    for x in sys.argv[1:]:
-        if x == "init":
-            setup()
-            exit()
-
+    #for x in sys.argv[1:]:
+    #    if x == "noinit":
+    #        main_menu()
+    #    else:
     main_menu()
 
 ###############################################################################

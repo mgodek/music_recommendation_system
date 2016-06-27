@@ -44,17 +44,19 @@ class TrackListingParser:
 
     ###########################################################################
 
-    def getSpotifySongIds(self, echo_user_recommended_tracks):
+    def getSpotifySongIds(self, echo_user_recommended_tracks, track_translation_filepath = ""):
         fin = open(path.relpath(self.echo_database_file_path_in), 'r')
 
         fin.readline() # skip first line
 
         spotify_track_ids = []
 
+        echo_spotify_translation = dict()
+
         for line in fin:
             song_id_echo, track_or, release, artist_or, year = line.strip().split(',')
             if song_id_echo in echo_user_recommended_tracks:
-                print("Found match in database for echoSongId: %s" % song_id_echo)
+                #print("Found match in database for echoSongId: %s" % song_id_echo)
 
                 # remove punctuations
                 exclude = set(string.punctuation)
@@ -72,23 +74,18 @@ class TrackListingParser:
 
                 for tracks in results["tracks"]['items']:
                     song_id_spotify = tracks["id"]
+                    echo_spotify_translation[song_id_echo] = song_id_spotify
                     print("Found in Spotify: %s %s" %(song_id_echo,song_id_spotify))
                     spotify_track_ids.append(song_id_spotify)
                     break # use only first track
 
         fin.close()
+
+        if track_translation_filepath != "":
+            fout = open(path.realpath(track_translation_filepath), 'w')
+            for key, value in echo_spotify_translation.items():
+                fout.write(key + ':' + value + '\n')
+            fout.close()
         return spotify_track_ids
-
-    ###########################################################################
-
-    def print(self):
-        print("Global track likes:")
-        for songId in self.global_track_like:
-            print(songId, ':', self.global_track_like[songId])
-        print("User track likes:")
-        for userId in self.user_track_like:
-            print(userId, ':')
-            for songId in self.user_track_like[userId]:
-                print(songId, '\t:', self.user_track_like[userId][songId])
 
     ###########################################################################
