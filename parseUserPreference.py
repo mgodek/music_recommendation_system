@@ -118,7 +118,7 @@ class UserTrackPreferences:
         for line in forig:
             if any(x in line for x in goodTrainUsers):
                 userId, song_id_echo, playCount = line.strip().split('\t')
-                if int(playCount) > 5: # using constant to limit size of train data
+                if int(playCount) > 10: # using constant to limit size of train data
                     ffiltered.write(line)
 
         forig.close()

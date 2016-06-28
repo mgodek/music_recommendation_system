@@ -10,11 +10,11 @@ from parseUserPreference import createPlaylistFromFile
 
 ###############################################################################
 
-utp = UserTrackPreferences("../MillionSongSubset/10000.txt",
+utp = UserTrackPreferences("10000.txt",
                            "train_users_track_preferences.txt",
                            "user_track_preferences.txt",
                            "user_favorites_translation.txt")#"song_translation_echo_spotify.txt")
-tlp = TrackListingParser("../MillionSongSubset/song_data.csv", "song_translation_RUNNING_CHANGE_echo_spotify.txt")
+tlp = TrackListingParser("song_data.csv", "song_translation_RUNNING_CHANGE_echo_spotify.txt")
 
 ###############################################################################
 
